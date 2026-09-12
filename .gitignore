@@ -5,3 +5,4 @@ projects.json
 *.log
 .DS_Store
 coverage/
+!test/fixtures/*.log

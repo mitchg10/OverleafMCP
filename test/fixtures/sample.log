@@ -1,0 +1,22 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex)
+(./main.tex
+LaTeX2e <2022-11-01> patch level 1
+(/usr/local/texlive/2023/texmf-dist/tex/latex/base/article.cls)
+./main.tex:12: Undefined control sequence.
+l.12 \foobar
+            
+LaTeX Warning: Reference `fig:one' on page 1 undefined on input line 27.
+
+LaTeX Warning: Citation `jones2019' on page 1 undefined on input line 17.
+
+Overfull \hbox (11.87059pt too wide) in paragraph at lines 206--218
+[]\OT1/ptm/m/n/10 Some text
+Overfull \hbox (12.97098pt too wide) in paragraph at lines 273--284
+
+Underfull \vbox (badness 10000) has occurred while \output is active
+./sections/intro.tex:4: LaTeX Error: Environment itemze undefined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+! Emergency stop.
+LaTeX Warning: There were undefined references.
+Output written on main.pdf (9 pages, 123456 bytes).
