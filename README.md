@@ -1,167 +1,106 @@
 # Overleaf MCP Server
 
-An MCP (Model Context Protocol) server that provides access to Overleaf projects via Git integration. This allows Claude and other MCP clients to read LaTeX files, analyze document structure, and extract content from Overleaf projects.
+An MCP server that lets Claude (or any MCP client) **read, search, compile, render, and edit** Overleaf projects through Overleaf's git bridge — without copy-pasting LaTeX back and forth.
 
-## Features
+## What it does
 
-- 📄 **File Management**: List and read files from Overleaf projects
-- 📋 **Document Structure**: Parse LaTeX sections and subsections
-- 🔍 **Content Extraction**: Extract specific sections by title
-- 📊 **Project Summary**: Get overview of project status and structure
-- 🏗️ **Multi-Project Support**: Manage multiple Overleaf projects
+| Area | Tools |
+|---|---|
+| Discover | `list_projects`, `status_summary` (main file, outline, bib, inputs, word count, last commit, pending edits), `list_files` |
+| Read selectively | `get_sections` (line-anchored outline, comments ignored), `get_section_content` (by title or line, with subsections), `search` (literal/regex across files), `read_file` (line ranges, numbered) |
+| Render | `compile` (latexmk → compact error/warning report), `render_page` (PNG images of pages), `pdf_text` (text of rendered pages) |
+| Edit | `edit_file` (exact-match replace), `replace_section`, `write_file`, `pending_changes`, `push_changes`, `discard_changes`, `sync` |
 
-## Installation
+Edits go to a local clone first. Nothing reaches Overleaf until `push_changes`, which commits, rebases onto any newer Overleaf changes, and pushes (the commit appears in the project's history). Real conflicts abort cleanly and are reported.
 
-1. Clone this repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Requirements
 
-3. Set up your projects configuration:
-   ```bash
-   cp projects.example.json projects.json
-   ```
+- Node **20+** (tested on 24)
+- `git`
+- For `compile` / `render_page` / `pdf_text`: a TeX distribution with `latexmk`, plus poppler (`pdftoppm`, `pdftotext`, `pdfinfo`). `texcount` (TeX Live) enables word counts.
 
-4. Edit `projects.json` with your Overleaf credentials:
-   ```json
-   {
-     "projects": {
-       "default": {
-         "name": "My Paper",
-         "projectId": "YOUR_OVERLEAF_PROJECT_ID",
-         "gitToken": "YOUR_OVERLEAF_GIT_TOKEN"
-       }
-     }
-   }
-   ```
+## Setup
 
-## Getting Overleaf Credentials
+```bash
+npm install
+cp projects.example.json projects.json   # then edit
+```
 
-1. **Git Token**: 
-   - Go to Overleaf Account Settings → Git Integration
-   - Click "Create Token"
+`projects.json`:
 
-2. **Project ID**: 
-   - Open your Overleaf project
-   - Find it in the URL: `https://www.overleaf.com/project/[PROJECT_ID]`
+```json
+{
+  "cacheDir": "~/Library/Caches/overleaf-mcp",
+  "syncTtlSeconds": 30,
+  "projects": {
+    "MyPaper": {
+      "name": "My Paper",
+      "projectId": "24-hex id from https://www.overleaf.com/project/<id>",
+      "gitToken": "olp_... (Overleaf → Account Settings → Git Integration)",
+      "mainFile": "main.tex",
+      "engine": "pdflatex",
+      "headings": ["rSection"]
+    }
+  }
+}
+```
 
-## Claude Desktop Setup
+Per-project fields other than `name`, `projectId`, `gitToken` are optional:
 
-Add to your Claude Desktop configuration file:
+- `mainFile` — root `.tex`; otherwise the first file with a live `\documentclass` is used.
+- `engine` — `pdflatex` | `xelatex` | `lualatex`. Omit to let a project `latexmkrc` decide (default pdflatex).
+- `headings` — extra heading macros/environments to include in outlines, e.g. `["rSection", "cvsection"]` for CV classes.
 
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Linux**: `~/.config/claude/claude_desktop_config.json`
+Top-level: `cacheDir` (where clones live; default `~/Library/Caches/overleaf-mcp` on macOS, `~/.cache/overleaf-mcp` elsewhere) and `syncTtlSeconds` (reads reuse a clone refreshed within this window).
+
+The token is passed to git only through the environment and a per-invocation credential helper; it is never written into the clone's remote URL and is scrubbed from error messages.
+
+### Claude Code
+
+```bash
+claude mcp add overleaf -- /opt/homebrew/bin/node /path/to/OverleafMCP/overleaf-mcp-server.js
+```
+
+### Claude Desktop
+
+`~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "overleaf": {
-      "command": "node",
-      "args": [
-        "/path/to/OverleafMCP/overleaf-mcp-server.js"
-      ]
+      "command": "/opt/homebrew/bin/node",
+      "args": ["/path/to/OverleafMCP/overleaf-mcp-server.js"]
     }
   }
 }
 ```
 
-Restart Claude Desktop after configuration.
+Use an absolute path to a Node ≥ 20 binary — GUI apps do not see your shell's `nvm` setup. `OVERLEAF_MCP_CONFIG=/other/projects.json` overrides the config location.
 
-## Available Tools
-
-### `list_projects`
-List all configured projects.
-
-### `list_files`
-List files in a project (default: .tex files).
-- `extension`: File extension filter (optional)
-- `projectName`: Project identifier (optional, defaults to "default")
-
-### `read_file`
-Read a specific file from the project.
-- `filePath`: Path to the file (required)
-- `projectName`: Project identifier (optional)
-
-### `get_sections`
-Get all sections from a LaTeX file.
-- `filePath`: Path to the LaTeX file (required)
-- `projectName`: Project identifier (optional)
-
-### `get_section_content`
-Get content of a specific section.
-- `filePath`: Path to the LaTeX file (required)
-- `sectionTitle`: Title of the section (required)
-- `projectName`: Project identifier (optional)
-
-### `status_summary`
-Get a comprehensive project status summary.
-- `projectName`: Project identifier (optional)
-
-## Usage Examples
+## Typical agent flow
 
 ```
-# List all projects
-Use the list_projects tool
-
-# Get project overview
-Use status_summary tool
-
-# Read main.tex file
-Use read_file with filePath: "main.tex"
-
-# Get Introduction section
-Use get_section_content with filePath: "main.tex" and sectionTitle: "Introduction"
-
-# List all sections in a file
-Use get_sections with filePath: "main.tex"
+status_summary        → what is this project, where is everything
+get_sections          → outline with line numbers
+get_section_content   → just the Methods section (subsections included)
+search                → every \cite{...} or TODO
+edit_file             → exact-match replacement, returns the diff
+compile               → errors as file:line, undefined refs, overfull boxes
+render_page           → look at page 3 as an image
+pending_changes       → review
+push_changes          → send to Overleaf
 ```
 
-## Multi-Project Usage
+## Development
 
-To work with multiple projects, add them to `projects.json`:
-
-```json
-{
-  "projects": {
-    "default": {
-      "name": "Main Paper",
-      "projectId": "project-id-1",
-      "gitToken": "token-1"
-    },
-    "paper2": {
-      "name": "Second Paper", 
-      "projectId": "project-id-2",
-      "gitToken": "token-2"
-    }
-  }
-}
+```bash
+npm test               # node:test; git tests run against a local bare repo (no network)
+npm run test:coverage
 ```
 
-Then specify the project in tool calls:
-```
-Use get_section_content with projectName: "paper2", filePath: "main.tex", sectionTitle: "Methods"
-```
-
-## File Structure
-
-```
-OverleafMCP/
-├── overleaf-mcp-server.js    # Main MCP server
-├── overleaf-git-client.js    # Git client library
-├── projects.json             # Your project configuration (gitignored)
-├── projects.example.json     # Example configuration
-├── package.json              # Dependencies
-└── README.md                 # This file
-```
-
-## Security Notes
-
-- `projects.json` is gitignored to protect your credentials
-- Never commit real project IDs or Git tokens
-- Use the provided `projects.example.json` as a template
+Layout: `src/latex/*` (pure parsers), `src/git-client.js`, `src/compile.js`, `src/render.js`, `src/edit.js`, `src/tools/*` (MCP tool registration), `src/server.js`.
 
 ## License
 
-MIT License
+MIT

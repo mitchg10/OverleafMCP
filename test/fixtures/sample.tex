@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage{graphicx}
+% \section{Commented Out Section}
+\usepackage{amsmath}
+\begin{document}
+\title{A Sample Paper}
+\maketitle
+\begin{abstract}
+Abstract text here.
+\end{abstract}
+
+\section{Introduction}
+Intro paragraph one with 50\% of something. % trailing comment \section{Fake}
+Intro paragraph two \cite{smith2020}.
+
+\section[Short]{Background \& Related Work}
+Background text \cite{jones2019,smith2020}.
+\subsection{Prior Studies}
+Prior studies text.
+\subsubsection{Using \LaTeX{} Well}
+Nested brace title body.
+
+\section{Methods}
+Methods intro.
+\subsection{Data Collection}
+Collection text.
+\subsection{Data Analysis}
+Analysis text \ref{fig:one}.
+\subsubsection{Confidence}
+Confidence in methods.
+
+\section{Results}
+Results intro.
+\subsection{Confidence}
+Confidence in results.
+
+\section*{Acknowledgments}
+Thanks.
+\input{appendix}
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}
+% \section{After End}

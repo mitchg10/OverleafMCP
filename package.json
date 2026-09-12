@@ -1,19 +1,22 @@
 {
   "name": "overleaf-mcp-server",
-  "version": "1.0.0",
-  "description": "MCP server for Overleaf integration",
+  "version": "2.0.0",
+  "description": "MCP server for reading, compiling, and editing Overleaf projects via the git bridge",
   "type": "module",
   "main": "overleaf-mcp-server.js",
   "bin": {
     "overleaf-mcp": "./overleaf-mcp-server.js"
   },
   "scripts": {
-    "start": "node overleaf-mcp-server.js"
+    "start": "node overleaf-mcp-server.js",
+    "test": "node --test test/",
+    "test:coverage": "node --test --experimental-test-coverage test/"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.21.0",
+    "zod": "^3.25.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

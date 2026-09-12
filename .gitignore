@@ -3,3 +3,5 @@ temp/
 projects.json
 .env
 *.log
+.DS_Store
+coverage/
