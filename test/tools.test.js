@@ -176,4 +176,22 @@ describe('MCP tools end to end', () => {
     assert.match(r, /pulled|up to date/i);
     assert.match((await call('read_file', { projectName: P, filePath: 'main.tex' })).text, /remote version/);
   });
+
+  // A caller-supplied mainFile skips findMainFile's allowlist and is handed to
+  // latexmk with cwd set to the clone, so it has to be checked like any other path.
+  test('an escaping mainFile is rejected by every build tool', async () => {
+    const extraArgs = { render_page: { pages: [1] } };
+    for (const name of ['compile', 'render_page', 'pdf_text']) {
+      for (const mainFile of ['../../../tmp/evil.tex', '/tmp/evil.tex', 'a/../../evil.tex']) {
+        const r = await call(name, { projectName: P, mainFile, ...extraArgs[name] });
+        assert.equal(r.isError, true, `${name} accepted ${mainFile}`);
+        assert.match(r.text, /outside the project/, `${name} rejected ${mainFile} for the wrong reason`);
+      }
+    }
+  });
+
+  test('a legitimate mainFile still works', async () => {
+    const r = await call('pdf_text', { projectName: P, mainFile: 'main.tex' });
+    assert.doesNotMatch(r.text, /outside the project/);
+  });
 });

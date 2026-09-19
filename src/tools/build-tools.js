@@ -5,8 +5,19 @@ import { registerTool, text, projectNameSchema } from './shared.js';
 
 const MAX_PAGES_PER_CALL = 4;
 
+/**
+ * A caller-supplied mainFile bypasses findMainFile, and with it the allowlist
+ * that checks the name against the files actually in the clone. It reaches
+ * latexmk as an argv entry with cwd set to the repo, so a `..` path would
+ * compile a file outside the project; p.absPath rejects that. The relative
+ * form is what callers need, so the resolved path is only used as the check.
+ */
 async function resolveMain(p, mainFile) {
-  const main = mainFile ?? (await findMainFile(p.repoPath, p.project));
+  if (mainFile) {
+    p.absPath(mainFile);
+    return mainFile;
+  }
+  const main = await findMainFile(p.repoPath, p.project);
   if (!main) throw new Error('No .tex file with \\documentclass found; pass mainFile explicitly.');
   return main;
 }
