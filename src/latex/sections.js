@@ -1,4 +1,4 @@
-import { stripComments } from './strip-comments.js';
+import { stripComments, stripVerbatim } from './strip-comments.js';
 
 const SECTION_TYPES = ['part', 'chapter', 'section', 'subsection', 'subsubsection', 'paragraph', 'subparagraph'];
 const LEVEL = Object.fromEntries(SECTION_TYPES.map((t, i) => [t, i - 1]));
@@ -25,12 +25,14 @@ function levelOf(type) {
  */
 export function parseSections(source, { includeCommented = false, headings = [] } = {}) {
   const re = headingRegex(headings);
-  const clean = stripComments(source);
+  // Verbatim bodies are blanked on both passes: a heading shown as sample code
+  // is neither a live heading nor a commented-out one, it is not markup at all.
+  const clean = stripVerbatim(stripComments(source));
   const live = scan(clean, re).map(s => ({ ...s, commented: false }));
   if (!includeCommented) return live;
 
   const liveKeys = new Set(live.map(s => s.index));
-  const all = scan(source, re).map(s => ({ ...s, commented: !liveKeys.has(s.index) }));
+  const all = scan(stripVerbatim(source), re).map(s => ({ ...s, commented: !liveKeys.has(s.index) }));
   return all;
 }
 

@@ -52,3 +52,25 @@ test('custom heading commands and environments via headings option', () => {
   ]);
   assert.equal(parseSections(cv).length, 0);
 });
+
+const verbatimSrc = await readFile(new URL('../fixtures/tex/verbatim.tex', import.meta.url), 'utf8');
+
+test('a heading shown as sample code is not part of the outline', () => {
+  const titles = parseSections(verbatimSrc).map(s => s.title);
+  assert.deepEqual(titles, ['Real Heading', 'Second Real Heading', 'Third Real Heading']);
+});
+
+test('a heading in verbatim is not reported as commented out either', () => {
+  // It is not markup at all, so neither pass should surface it.
+  const titles = parseSections(verbatimSrc, { includeCommented: true }).map(s => s.title);
+  for (const fake of ['Verbatim Heading', 'Listing Heading', 'Minted Heading', 'Starred Verbatim Heading']) {
+    assert.ok(!titles.includes(fake), `${fake} leaked into the outline`);
+  }
+});
+
+test('line numbers still line up with the source around verbatim', () => {
+  const lines = verbatimSrc.split('\n');
+  for (const s of parseSections(verbatimSrc)) {
+    assert.match(lines[s.line - 1], new RegExp(`\\{${s.title}\\}`), `line ${s.line} for "${s.title}"`);
+  }
+});

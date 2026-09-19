@@ -1,0 +1,30 @@
+\documentclass{article}
+\begin{document}
+
+\section{Real Heading}
+
+Prose with a 50\% escaped percent and a trailing comment. % this is a comment
+
+\begin{verbatim}
+A literal 100% percent sign, not a comment.
+\section{Verbatim Heading}
+\end{verbatim}
+
+\subsection{Second Real Heading}
+
+\begin{lstlisting}[language=TeX]
+\section{Listing Heading}
+% not a comment either
+\end{lstlisting}
+
+\begin{minted}{latex}
+\chapter{Minted Heading}
+\end{minted}
+
+\begin{verbatim*}
+\paragraph{Starred Verbatim Heading}
+\end{verbatim*}
+
+\section{Third Real Heading}
+
+\end{document}
