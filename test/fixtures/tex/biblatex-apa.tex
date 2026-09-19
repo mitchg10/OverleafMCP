@@ -1,0 +1,9 @@
+\documentclass{article}
+% \bibliographystyle{acm}
+\usepackage[style=apa,natbib=true,backend=biber]{biblatex}
+\addbibresource{messy.bib}
+\begin{document}
+\parencite{Braced_2026} and \citep{BareYear_2025} under natbib compat.
+\parencites[see][]{A}[1]{B}
+\printbibliography
+\end{document}

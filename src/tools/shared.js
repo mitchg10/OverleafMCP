@@ -13,8 +13,8 @@ export function text(str) {
   return { content: [{ type: 'text', text: str }] };
 }
 
-export function errorResult(error) {
-  return { content: [{ type: 'text', text: `Error: ${scrubSecrets(error.message)}` }], isError: true };
+export function errorResult(error, scrub = scrubSecrets) {
+  return { content: [{ type: 'text', text: `Error: ${scrub(error.message)}` }], isError: true };
 }
 
 /**
@@ -26,7 +26,7 @@ export function registerTool(server, ctx, name, { description, inputSchema }, ha
     try {
       return await handler(args ?? {}, ctx);
     } catch (error) {
-      return errorResult(error);
+      return errorResult(error, ctx.scrub ?? scrubSecrets);
     }
   });
 }

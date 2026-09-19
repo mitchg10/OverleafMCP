@@ -6,3 +6,9 @@ projects.json
 .DS_Store
 coverage/
 !test/fixtures/*.log
+
+# Serena
+.serena/
+
+# Claude
+.claude/

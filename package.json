@@ -9,8 +9,8 @@
   },
   "scripts": {
     "start": "node overleaf-mcp-server.js",
-    "test": "node --test test/",
-    "test:coverage": "node --test --experimental-test-coverage test/"
+    "test": "node --test",
+    "test:coverage": "node --test --experimental-test-coverage"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.21.0",

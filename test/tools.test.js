@@ -43,7 +43,7 @@ describe('MCP tools end to end', () => {
     const names = tools.map(t => t.name).sort();
     for (const n of ['list_projects', 'list_files', 'read_file', 'get_sections', 'get_section_content', 'search',
       'status_summary', 'sync', 'compile', 'render_page', 'pdf_text', 'edit_file', 'replace_section', 'write_file',
-      'pending_changes', 'push_changes', 'discard_changes']) {
+      'pending_changes', 'push_changes', 'discard_changes', 'check_citations', 'verify_references']) {
       assert.ok(names.includes(n), `missing ${n}`);
     }
     assert.ok(tools.every(t => t.description.length > 40), 'every tool has a real description');

@@ -5,11 +5,10 @@ import { findMainFile } from './compile.js';
 import { walkFiles } from './paths.js';
 import { parseSections, formatOutline } from './latex/sections.js';
 import { stripComments } from './latex/strip-comments.js';
+import { parseInputs, parseBibResources, bibResourceNames } from './latex/declarations.js';
 
 const execFile = promisify(execFileCb);
 const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.pdf', '.eps', '.svg'];
-const INPUT_RE = /\\(?:input|include|subfile)\{([^}]+)\}/g;
-const BIB_RE = /\\(?:bibliography|addbibresource)\{([^}]+)\}/g;
 
 /** Human/agent-readable project overview. `p` is an opened project context. */
 export async function buildStatusSummary(p) {
@@ -32,7 +31,7 @@ export async function buildStatusSummary(p) {
     '',
     `Files: ${allFiles.length} total — ${countBy(allFiles, '.tex')} .tex, ${countBy(allFiles, '.bib')} .bib, ${allFiles.filter(f => IMAGE_EXTS.includes(path.extname(f.path).toLowerCase())).length} figures/images`,
     `Bibliography: ${listOr(bibFiles(main, allFiles))}`,
-    `Inputs from main: ${listOr(matches(main, INPUT_RE))}`,
+    `Inputs from main: ${listOr(parseInputs(main).map(i => i.raw))}`,
     words === null ? null : `Word count (texcount, main + inputs): ${words}`,
     '',
     `Outline of ${mainFile ?? 'main file'} (${sections.length} headings):`,
@@ -49,14 +48,10 @@ function localState(changed, unpushed) {
   return `Local state: ${parts.join('; ')} — use pending_changes / push_changes`;
 }
 
-function matches(text, re) {
-  return [...text.matchAll(re)].map(m => m[1]);
-}
-
 function bibFiles(main, allFiles) {
-  const declared = matches(main, BIB_RE).flatMap(s => s.split(',')).map(s => s.trim());
+  const declared = parseBibResources(main).flatMap(r => bibResourceNames(r.raw));
   const onDisk = allFiles.filter(f => f.path.endsWith('.bib')).map(f => f.path);
-  return [...new Set([...declared.map(d => (d.endsWith('.bib') ? d : `${d}.bib`)), ...onDisk])];
+  return [...new Set([...declared, ...onDisk])];
 }
 
 function countBy(files, ext) {

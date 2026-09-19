@@ -8,7 +8,20 @@
       "gitToken": "olp_YOUR_OVERLEAF_GIT_TOKEN",
       "mainFile": "main.tex",
       "engine": "pdflatex",
-      "headings": ["rSection"]
+      "headings": [
+        "rSection"
+      ],
+      "selfAuthors": [
+        "YourSurname"
+      ]
+    }
+  },
+  "verify": {
+    "enabled": true,
+    "timeoutMs": 15000,
+    "thresholds": {
+      "accept": 0.85,
+      "consider": 0.6
     }
   }
 }

@@ -1,0 +1,13 @@
+% AAAI shape: natbib is loaded here, but the style lives in the .sty.
+% This decoy must be ignored:
+% \bibliographystyle{acm}
+\documentclass[letterpaper]{article}
+\usepackage{fakestyle}
+\usepackage{natbib}
+\begin{document}
+Text \citep{Braced_2026} and \citet*{BareYear_2025}.
+A commented citation must not count: % \cite{NeverCited}
+\cite[\textbf{fig.~2}]{UpperUrl_2024}
+\citeyearpar{SweBench_2023}
+\bibliography{messy}
+\end{document}

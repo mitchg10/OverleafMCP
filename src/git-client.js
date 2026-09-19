@@ -23,10 +23,37 @@ export class ConflictError extends Error {
   }
 }
 
+/**
+ * Credential-bearing URL parameters, which appear in verification requests.
+ * Redacted by parameter name rather than by value shape: a generic
+ * "long hex string" pattern would also eat git SHAs, which are not secrets and
+ * are load-bearing in this tool's output.
+ */
+const URL_SECRET_PARAM_RE = /([?&](?:[A-Za-z]+[-_])?(?:api[-_]?key|key|token|mailto)=)[^&\s]+/gi;
+
 /** Replace Overleaf git tokens in any text before it leaves this module. */
 export function scrubSecrets(text, token) {
   const scrubbedKnown = token ? String(text).split(token).join('***') : String(text);
-  return scrubbedKnown.replace(TOKEN_RE, '***');
+  return scrubbedKnown.replace(TOKEN_RE, '***').replace(URL_SECRET_PARAM_RE, '$1***');
+}
+
+/**
+ * A scrubber that removes an explicit list of secret values.
+ *
+ * Value-based by design. API keys have no reliable shape to match on, so the
+ * only safe approach is to redact the exact strings we know are secret.
+ *
+ * @param {{ secrets?: string[] }} options
+ * @returns {(text: string) => string}
+ */
+export function createScrubber({ secrets = [] } = {}) {
+  // Longest first, so a secret containing another is redacted whole.
+  const values = [...new Set(secrets.filter(Boolean))].sort((a, b) => b.length - a.length);
+  return function scrub(text) {
+    let out = scrubSecrets(text);
+    for (const secret of values) out = out.split(secret).join('***');
+    return out;
+  };
 }
 
 /**

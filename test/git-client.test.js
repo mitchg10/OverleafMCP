@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createFakeOverleaf } from './helpers/fake-overleaf.js';
-import { createGitClient, scrubSecrets, ConflictError } from '../src/git-client.js';
+import { createGitClient, scrubSecrets, createScrubber, ConflictError } from '../src/git-client.js';
 
 describe('git client against a fake remote', () => {
   let fake;
@@ -107,4 +107,37 @@ test('auth failure never leaks the token', async () => {
     assert.doesNotMatch(err.message, /LEAKME/);
     return true;
   });
+});
+
+test('createScrubber removes known secret values verbatim', () => {
+  const scrub = createScrubber({ secrets: ['s2k-AbCdEf123456', 'olp_deadbeef'] });
+  assert.equal(scrub('key=s2k-AbCdEf123456 done'), 'key=*** done');
+  assert.equal(scrub('using olp_deadbeef here'), 'using *** here');
+});
+
+test('createScrubber leaves git SHAs alone', () => {
+  // A shape-based rule would eat these; they are not secrets and the output
+  // depends on them.
+  const sha = '7229a88f3c1d4e5a6b7c8d9e0f1a2b3c4d5e6f70';
+  assert.equal(createScrubber({ secrets: ['s2k-AbCdEf123456'] })(`commit ${sha}`), `commit ${sha}`);
+});
+
+test('credential-bearing URL parameters are redacted by name', () => {
+  assert.equal(
+    scrubSecrets('GET https://api.semanticscholar.org/graph/v1/paper?x-api-key=abc123&fields=title'),
+    'GET https://api.semanticscholar.org/graph/v1/paper?x-api-key=***&fields=title',
+  );
+  assert.equal(
+    scrubSecrets('https://api.crossref.org/works?mailto=someone@example.edu&rows=1'),
+    'https://api.crossref.org/works?mailto=***&rows=1',
+  );
+});
+
+test('a secret containing another is redacted whole', () => {
+  const scrub = createScrubber({ secrets: ['abc123', 'abc123456789'] });
+  assert.equal(scrub('value abc123456789 end'), 'value *** end');
+});
+
+test('an empty secret list still scrubs Overleaf tokens', () => {
+  assert.match(createScrubber({})('olp_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), /\*\*\*/);
 });
