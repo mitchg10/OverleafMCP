@@ -1,0 +1,125 @@
+% This fixture reproduces, in miniature, every inconsistency found in the real
+% aaai2027.bib. Do not tidy it up: the mess is the test.
+% Note that `%` is NOT a comment character in BibTeX, so this header is parsed
+% as junk between entries and must be ignored rather than stripped.
+
+@string{aaaipress = "AAAI Press"}
+
+@article{Braced_2026,
+  author  = {Smith, Jane and van der Berg, Jan},
+  title   = {A Perfectly Ordinary {Paper} About {AI}},
+  journal = {Journal of Things},
+  year    = {2026},
+  volume  = {12},
+  url     = {https://example.org/ordinary},
+  doi     = {10.1145/3641554.3701825}
+}
+
+@article{BareYear_2025,
+  author  = {Doe, John},
+  title   = {Bare Year Value},
+  journal = {Journal of Things},
+  year    = 2025
+}
+
+@article{UpperUrl_2024,
+  author  = {Clements, III, Herman Ronald},
+  title   = {Field Name Case Drift},
+  journal = {Journal of Things},
+  year    = {2024},
+  URL     = {https://example.org/upper}
+}
+
+@misc{ConflictingUrls_2025,
+  author = {{OpenAI}},
+  title  = {Two Different Targets},
+  year   = {2025},
+  url    = {https://example.org/one},
+  note   = {\url{https://example.org/two}. Accessed: 2025-01-02}
+}
+
+@misc{DuplicateAccessed_2025,
+  author  = {Thompson, Alice},
+  title   = {Urldate and Note Both Claim Access},
+  year    = {2025},
+  url     = {https://example.org/three},
+  urldate = {2025-03-04},
+  note    = {Accessed: 2025-03-04}
+}
+
+@misc{Howpublished_2025,
+  author       = {Lee, Bo},
+  title        = {A Third URL Convention},
+  year         = {2025},
+  howpublished = {\url{https://example.org/four}}
+}
+
+@inbook{AuthorAndEditor_2010,
+  author    = {Diener, Ed},
+  editor    = {Kahneman, Daniel},
+  title     = {Chapter With Both Roles},
+  booktitle = {A Collection},
+  publisher = aaaipress,
+  year      = {2010},
+  isbn      = {978-0-00-000000-1 978-0-00-000000-2}
+}
+
+@article{NewsAsArticle_2025,
+  author  = {Roose, Kevin},
+  title   = {A Newspaper Story Typed as a Journal Article},
+  journal = {The New York Times},
+  year    = {2025}
+}
+
+@misc{SweBench_2023,
+  author        = {Jimenez, Carlos E. and Yang, John and Wettig, Alexander and others},
+  title         = {{SWE}-bench: Can Language Models Resolve Real-World {GitHub} Issues?},
+  year          = {2023},
+  eprint        = {2310.06770},
+  archiveprefix = {arXiv},
+  primaryclass  = {cs.CL},
+  publisher     = {arXiv},
+  doi           = {10.48550/ARXIV.2310.06770}
+}
+
+@misc{CasedArxivDoi_2025,
+  author = {Handa, Kunal and Tamkin, Alex and others},
+  title  = {Lowercase arXiv DOI Variant},
+  year   = {2025},
+  number = {arXiv:2503.04761},
+  doi    = {10.48550/arXiv.2503.04761}
+}
+
+@misc{UrlOnlyArxiv_2024,
+  author = {Nobody, A.},
+  title  = {Preprint Identified Only By Its URL},
+  year   = {2024},
+  url    = {https://arxiv.org/abs/2401.00001v2}
+}
+
+@article{Submitted_2026,
+  author   = {Gerhardt, Mitchell},
+  title    = {Work That Cannot Be Verified By Design},
+  journal  = {Under Review},
+  pubstate = {submitted}
+}
+
+@inproceedings{Concatenated_2020,
+  author    = {Someone, B.},
+  title     = {Uses @string Concatenation} # { and More},
+  booktitle = {Proceedings},
+  publisher = aaaipress,
+  year      = {2020}
+}
+
+@Article(ParenDelimited_2019,
+  author = {Parens, Are Legal},
+  title  = {Entry Delimited By Parentheses},
+  year   = {2019}
+)
+
+@misc{Accented_2018,
+  author = {Sim{\'o}n, Bol{\'i}var and Stra{\ss}e, G{\"u}nter},
+  title  = {Accents and {\ss} Ligatures},
+  year   = {2018}
+}

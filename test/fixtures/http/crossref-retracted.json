@@ -1,0 +1,423 @@
+{
+ "status": "ok",
+ "message-type": "work",
+ "message-version": "1.0.0",
+ "message": {
+  "indexed": {
+   "date-parts": [
+    [
+     2026,
+     4,
+     1
+    ]
+   ],
+   "date-time": "2026-04-01T03:38:33Z",
+   "timestamp": 1775014713289,
+   "version": "3.50.1"
+  },
+  "update-to": [
+   {
+    "DOI": "10.1016/s0140-6736(20)31174-0",
+    "type": "retraction",
+    "label": "Retraction",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       22
+      ]
+     ],
+     "date-time": "2020-05-22T00:00:00Z",
+     "timestamp": 1590105600000
+    }
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31290-3",
+    "type": "retraction",
+    "label": "Retraction",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       22
+      ]
+     ],
+     "date-time": "2020-05-22T00:00:00Z",
+     "timestamp": 1590105600000
+    }
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31324-6",
+    "type": "retraction",
+    "label": "Retraction",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       22
+      ]
+     ],
+     "date-time": "2020-05-22T00:00:00Z",
+     "timestamp": 1590105600000
+    }
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31528-2",
+    "type": "retraction",
+    "label": "Retraction",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       22
+      ]
+     ],
+     "date-time": "2020-05-22T00:00:00Z",
+     "timestamp": 1590105600000
+    }
+   }
+  ],
+  "reference-count": 26,
+  "publisher": "Elsevier BV",
+  "license": [
+   {
+    "start": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       1
+      ]
+     ],
+     "date-time": "2020-05-01T00:00:00Z",
+     "timestamp": 1588291200000
+    },
+    "content-version": "tdm",
+    "delay-in-days": 0,
+    "URL": "https://www.elsevier.com/tdm/userlicense/1.0/"
+   },
+   {
+    "start": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       1
+      ]
+     ],
+     "date-time": "2020-05-01T00:00:00Z",
+     "timestamp": 1588291200000
+    },
+    "content-version": "tdm",
+    "delay-in-days": 0,
+    "URL": "https://www.elsevier.com/legal/tdmrep-license"
+   }
+  ],
+  "content-domain": {
+   "domain": [
+    "clinicalkey.com",
+    "clinicalkey.com.au",
+    "clinicalkey.es",
+    "clinicalkey.fr",
+    "clinicalkey.jp",
+    "em-consulte.com",
+    "thelancet.com",
+    "elsevier.com",
+    "sciencedirect.com"
+   ],
+   "crossmark-restriction": true
+  },
+  "short-container-title": [
+   "The Lancet"
+  ],
+  "published-print": {
+   "date-parts": [
+    [
+     2020,
+     5
+    ]
+   ]
+  },
+  "DOI": "10.1016/s0140-6736(20)31180-6",
+  "type": "journal-article",
+  "created": {
+   "date-parts": [
+    [
+     2020,
+     5,
+     22
+    ]
+   ],
+   "date-time": "2020-05-22T17:13:08Z",
+   "timestamp": 1590167588000
+  },
+  "update-policy": "https://doi.org/10.1016/elsevier_cm_policy",
+  "source": "Crossref",
+  "is-referenced-by-count": 415,
+  "title": [
+   "RETRACTED: Hydroxychloroquine or chloroquine with or without a macrolide for treatment of COVID-19: a multinational registry analysis"
+  ],
+  "prefix": "10.1016",
+  "author": [
+   {
+    "given": "Mandeep R",
+    "family": "Mehra",
+    "sequence": "first",
+    "affiliation": [],
+    "role": [
+     {
+      "role": "author",
+      "vocabulary": "crossref"
+     }
+    ]
+   },
+   {
+    "given": "Sapan S",
+    "family": "Desai",
+    "sequence": "additional",
+    "affiliation": [],
+    "role": [
+     {
+      "role": "author",
+      "vocabulary": "crossref"
+     }
+    ]
+   },
+   {
+    "given": "Frank",
+    "family": "Ruschitzka",
+    "sequence": "additional",
+    "affiliation": [],
+    "role": [
+     {
+      "role": "author",
+      "vocabulary": "crossref"
+     }
+    ]
+   },
+   {
+    "given": "Amit N",
+    "family": "Patel",
+    "sequence": "additional",
+    "affiliation": [],
+    "role": [
+     {
+      "role": "author",
+      "vocabulary": "crossref"
+     }
+    ]
+   }
+  ],
+  "member": "78",
+  "updated-by": [
+   {
+    "DOI": "10.1016/s0140-6736(20)31290-3",
+    "type": "expression_of_concern",
+    "label": "Expression of concern",
+    "source": "retraction-watch",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       6,
+       3
+      ]
+     ],
+     "date-time": "2020-06-03T00:00:00Z",
+     "timestamp": 1591142400000
+    },
+    "record-id": "23527"
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31249-6",
+    "type": "correction",
+    "label": "Correction",
+    "source": "retraction-watch",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       30
+      ]
+     ],
+     "date-time": "2020-05-30T00:00:00Z",
+     "timestamp": 1590796800000
+    },
+    "record-id": "23528"
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31324-6",
+    "type": "retraction",
+    "label": "Retraction",
+    "source": "retraction-watch",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       6,
+       5
+      ]
+     ],
+     "date-time": "2020-06-05T00:00:00Z",
+     "timestamp": 1591315200000
+    },
+    "record-id": "23529"
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31174-0",
+    "type": "retraction",
+    "label": "Retraction",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       22
+      ]
+     ],
+     "date-time": "2020-05-22T00:00:00Z",
+     "timestamp": 1590105600000
+    }
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31324-6",
+    "type": "erratum",
+    "label": "Erratum",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       6,
+       13
+      ]
+     ],
+     "date-time": "2020-06-13T00:00:00Z",
+     "timestamp": 1592006400000
+    }
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31528-2",
+    "type": "erratum",
+    "label": "Erratum",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       7,
+       18
+      ]
+     ],
+     "date-time": "2020-07-18T00:00:00Z",
+     "timestamp": 1595030400000
+    }
+   },
+   {
+    "DOI": "10.1016/s0140-6736(20)31249-6",
+    "type": "erratum",
+    "label": "Erratum",
+    "source": "publisher",
+    "updated": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       30
+      ]
+     ],
+     "date-time": "2020-05-30T00:00:00Z",
+     "timestamp": 1590796800000
+    }
+   }
+  ],
+  "container-title": [
+   "The Lancet"
+  ],
+  "original-title": [],
+  "language": "en",
+  "link": [
+   {
+    "URL": "https://api.elsevier.com/content/article/PII:S0140673620311806?httpAccept=text/xml",
+    "content-type": "text/xml",
+    "content-version": "vor",
+    "intended-application": "text-mining"
+   },
+   {
+    "URL": "https://api.elsevier.com/content/article/PII:S0140673620311806?httpAccept=text/plain",
+    "content-type": "text/plain",
+    "content-version": "vor",
+    "intended-application": "text-mining"
+   }
+  ],
+  "deposited": {
+   "date-parts": [
+    [
+     2025,
+     9,
+     26
+    ]
+   ],
+   "date-time": "2025-09-26T00:13:43Z",
+   "timestamp": 1758845623000
+  },
+  "score": 1,
+  "resource": {
+   "primary": {
+    "URL": "https://linkinghub.elsevier.com/retrieve/pii/S0140673620311806"
+   }
+  },
+  "subtitle": [],
+  "short-title": [],
+  "issued": {
+   "date-parts": [
+    [
+     2020,
+     5
+    ]
+   ]
+  },
+  "references-count": 26,
+  "alternative-id": [
+   "S0140673620311806"
+  ],
+  "URL": "https://doi.org/10.1016/s0140-6736(20)31180-6",
+  "relation": {
+   "has-review": [
+    {
+     "id-type": "doi",
+     "id": "10.3410/f.737996380.793574823",
+     "asserted-by": "object"
+    }
+   ]
+  },
+  "ISSN": [
+   "0140-6736"
+  ],
+  "issn-type": [
+   {
+    "value": "0140-6736",
+    "type": "print"
+   }
+  ],
+  "subject": [],
+  "published": {
+   "date-parts": [
+    [
+     2020,
+     5
+    ]
+   ]
+  }
+ }
+}

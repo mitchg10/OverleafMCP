@@ -3,3 +3,12 @@ temp/
 projects.json
 .env
 *.log
+.DS_Store
+coverage/
+!test/fixtures/*.log
+
+# Serena
+.serena/
+
+# Claude
+.claude/
