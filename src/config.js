@@ -8,7 +8,8 @@ export const ENGINES = ['pdflatex', 'xelatex', 'lualatex'];
 const projectSchema = z.object({
   name: z.string().min(1),
   projectId: z.string().regex(/^[0-9a-f]{24}$/, 'projectId must be a 24-char hex Overleaf id'),
-  gitToken: z.string().min(1),
+  /** Optional here only because it may arrive from the environment; see withProjectEnvFallbacks. */
+  gitToken: z.string().min(1).optional(),
   mainFile: z.string().optional(),
   engine: z.enum(ENGINES).optional(),
   headings: z.array(z.string().regex(/^[A-Za-z@]+$/)).optional(),
@@ -81,9 +82,35 @@ export function parseConfig(raw, env = process.env) {
   const cfg = result.data;
   return {
     ...cfg,
+    projects: withProjectEnvFallbacks(cfg.projects, env),
     cacheDir: expandHome(cfg.cacheDir ?? defaultCacheDir()),
     verify: withEnvFallbacks(cfg.verify, env),
   };
+}
+
+/**
+ * A project's git token may come from the environment instead of the config
+ * file, so it need not be written to disk at all. The config file wins where
+ * both are set, for the same reason as withEnvFallbacks.
+ *
+ * OVERLEAF_GIT_TOKEN applies to every project that has no token of its own,
+ * which is only unambiguous for a single-project config; give each project its
+ * own token in the file when there are several. A project left with no token
+ * fails here rather than at the first git call, where it would surface as an
+ * opaque authentication error.
+ */
+function withProjectEnvFallbacks(projects, env) {
+  const fallback = env.OVERLEAF_GIT_TOKEN?.trim();
+  const filled = Object.entries(projects).map(([key, project]) =>
+    [key, project.gitToken ? project : { ...project, gitToken: fallback }]);
+  const missing = filled.filter(([, project]) => !project.gitToken).map(([key]) => key);
+  if (missing.length) {
+    throw new Error(
+      `Invalid projects.json: no gitToken for ${missing.join(', ')}. Set one per project in the ` +
+      'config file, or set OVERLEAF_GIT_TOKEN / OVERLEAF_GIT_TOKEN_FILE for a single-project config.',
+    );
+  }
+  return Object.fromEntries(filled);
 }
 
 /**
@@ -109,14 +136,29 @@ export function secretsOf(config) {
   ].filter(s => typeof s === 'string' && s.length >= 6);
 }
 
-export async function loadConfig(configPath) {
+export async function loadConfig(configPath, env = process.env) {
   let text;
   try {
     text = await readFile(configPath, 'utf-8');
   } catch (error) {
     throw new Error(`Cannot read ${configPath}: ${error.message}. Create it from projects.example.json.`);
   }
-  return parseConfig(JSON.parse(text));
+  return parseConfig(JSON.parse(text), await withTokenFile(env));
+}
+
+/**
+ * Resolve OVERLEAF_GIT_TOKEN_FILE into OVERLEAF_GIT_TOKEN, keeping parseConfig
+ * synchronous. Reading the token from a file keeps it out of the process
+ * environment of anything this server spawns, and out of shell history.
+ */
+async function withTokenFile(env) {
+  const file = env.OVERLEAF_GIT_TOKEN_FILE;
+  if (!file || env.OVERLEAF_GIT_TOKEN) return env;
+  try {
+    return { ...env, OVERLEAF_GIT_TOKEN: (await readFile(expandHome(file), 'utf-8')).trim() };
+  } catch (error) {
+    throw new Error(`Cannot read OVERLEAF_GIT_TOKEN_FILE ${file}: ${error.message}`);
+  }
 }
 
 export function projectKeys(config) {

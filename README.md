@@ -55,6 +55,16 @@ Per-project fields other than `name`, `projectId`, `gitToken` are optional:
 - `selfAuthors` - surnames whose unpublished work is never flagged and never sent to any API.
 - `citeCommands` - project-specific citation macros, e.g. `["mycite"]`.
 
+`gitToken` may be left out of the file and supplied by the environment instead, which is
+the better option if `projects.json` is backed up or synced:
+
+- `OVERLEAF_GIT_TOKEN` — used by any project that has no `gitToken` of its own.
+- `OVERLEAF_GIT_TOKEN_FILE` — path to a file holding the token; trailing newline is trimmed.
+
+A token in `projects.json` wins over both, and `OVERLEAF_GIT_TOKEN` wins over the file. The
+env token applies to every project lacking one, so it is only unambiguous for a single-project
+config. A project with no token from any source fails at startup rather than at the first git call.
+
 Top-level: `cacheDir` (where clones live; default `~/Library/Caches/overleaf-mcp` on macOS, `~/.cache/overleaf-mcp` elsewhere) and `syncTtlSeconds` (reads reuse a clone refreshed within this window).
 
 The optional top-level `verify` block controls the network half of citation checking.

@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseConfig, getProjectConfig, secretsOf } from '../src/config.js';
-import { readFile } from 'node:fs/promises';
+import { parseConfig, getProjectConfig, secretsOf, loadConfig } from '../src/config.js';
+import { readFile, writeFile, mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 
 const raw = {
   projects: {
@@ -92,4 +94,59 @@ test('the shipped example config validates once the placeholders are filled in',
   assert.equal(config.verify.enabled, true);
   assert.equal(config.verify.mailto, undefined, 'the example must not ship an email address');
   assert.equal(config.verify.minIntervalMs['api.semanticscholar.org'], 1100);
+});
+
+const noToken = { projects: { A: { name: 'Paper A', projectId: '6a205a9d3a0fc9b041b2a909' } } };
+
+test('a project git token falls back to the environment', () => {
+  const cfg = parseConfig(noToken, { OVERLEAF_GIT_TOKEN: 'olp_from_env' });
+  assert.equal(cfg.projects.A.gitToken, 'olp_from_env');
+});
+
+test('a git token in the config file wins over the environment', () => {
+  const cfg = parseConfig(raw, { OVERLEAF_GIT_TOKEN: 'olp_from_env' });
+  assert.equal(cfg.projects.A.gitToken, 'olp_abc');
+  assert.equal(cfg.projects.B.gitToken, 'olp_def');
+});
+
+test('a project with no token anywhere fails at load, naming the project', () => {
+  assert.throws(() => parseConfig(noToken, {}), /no gitToken for A.*OVERLEAF_GIT_TOKEN/s);
+});
+
+test('an env-supplied token is still collected for scrubbing', () => {
+  // secretsOf reads the filled projects, so it must run after the env fallback;
+  // otherwise a token supplied by the environment would never be redacted.
+  const cfg = parseConfig(noToken, { OVERLEAF_GIT_TOKEN: 'olp_from_env' });
+  assert.ok(secretsOf(cfg).includes('olp_from_env'));
+});
+
+test('loadConfig reads the token from OVERLEAF_GIT_TOKEN_FILE', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'overleaf-cfg-'));
+  const configPath = path.join(dir, 'projects.json');
+  const tokenPath = path.join(dir, 'token');
+  await writeFile(configPath, JSON.stringify(noToken));
+  await writeFile(tokenPath, 'olp_from_file\n');
+  const cfg = await loadConfig(configPath, { OVERLEAF_GIT_TOKEN_FILE: tokenPath });
+  assert.equal(cfg.projects.A.gitToken, 'olp_from_file', 'trailing newline is trimmed');
+});
+
+test('OVERLEAF_GIT_TOKEN wins over OVERLEAF_GIT_TOKEN_FILE', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'overleaf-cfg-'));
+  const configPath = path.join(dir, 'projects.json');
+  await writeFile(configPath, JSON.stringify(noToken));
+  const cfg = await loadConfig(configPath, {
+    OVERLEAF_GIT_TOKEN: 'olp_direct',
+    OVERLEAF_GIT_TOKEN_FILE: path.join(dir, 'does-not-exist'),
+  });
+  assert.equal(cfg.projects.A.gitToken, 'olp_direct', 'the missing file is never read');
+});
+
+test('an unreadable OVERLEAF_GIT_TOKEN_FILE reports the path', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'overleaf-cfg-'));
+  const configPath = path.join(dir, 'projects.json');
+  await writeFile(configPath, JSON.stringify(noToken));
+  await assert.rejects(
+    loadConfig(configPath, { OVERLEAF_GIT_TOKEN_FILE: path.join(dir, 'nope') }),
+    /OVERLEAF_GIT_TOKEN_FILE.*nope/s,
+  );
 });
