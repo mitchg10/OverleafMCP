@@ -1,6 +1,9 @@
 import { finding, siteOf } from './finding.js';
 import { urlsOf, stripLatex } from '../normalize.js';
-import { REQUIRED_FIELDS, AUTHOR_EDITOR_EXCLUSIVE, NEWS_OUTLETS, ACCESSED_PHRASE } from '../field-rules.js';
+import {
+  REQUIRED_FIELDS, AUTHOR_EDITOR_EXCLUSIVE, NEWS_OUTLETS, ACCESSED_PHRASE,
+  LOCATION_FIELDS, NON_PLACE_LOCATIONS, COUNTRIES, normalizePlace,
+} from '../field-rules.js';
 
 /**
  * Per-entry content defects, driven by the tables in `field-rules.js`.
@@ -124,6 +127,34 @@ export const newsAsArticle = {
   },
 };
 
+export const locationMissingCountry = {
+  id: 'location-missing-country',
+  severity: 'info',
+  requires: null,
+  check(model) {
+    const out = [];
+    for (const entry of checkable(model)) {
+      for (const name of LOCATION_FIELDS) {
+        if (!hasValue(entry, name)) continue;
+        const value = entry.fields[name].value;
+        if (endsInCountry(value)) continue;
+        out.push(finding('location-missing-country', 'info', {
+          ...siteOf(entry, name),
+          message: `${entry.key} has ${name}={${trim(value)}} with no country`,
+          hint: 'End the location with a country, e.g. "Austin, TX, USA".',
+        }));
+      }
+    }
+    return out;
+  },
+};
+
+function endsInCountry(value) {
+  const plain = normalizePlace(stripLatex(value));
+  if (NON_PLACE_LOCATIONS.includes(plain)) return true;
+  return COUNTRIES.has(normalizePlace(plain.split(',').pop()));
+}
+
 function checkable(model) {
   const excluded = new Set(model.excludedKeys ?? []);
   return model.entries.filter(e => !e.partial && !excluded.has(e.key));
@@ -139,5 +170,5 @@ function trim(text) {
 
 export const FIELD_RULES = [
   missingRequiredField, authorAndEditor, conflictingUrls,
-  duplicatedAccessDate, multipleIsbn, newsAsArticle,
+  duplicatedAccessDate, multipleIsbn, newsAsArticle, locationMissingCountry,
 ];

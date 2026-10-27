@@ -234,3 +234,31 @@ test('partitionUnverifiable splits without sharing objects between buckets', () 
   assert.equal(checkable.length + excluded.length, messyParsed.entries.length);
   assert.ok(!checkable.some(e => excluded.some(x => x.entry.key === e.key)));
 });
+
+const locationFindings = body =>
+  only(runRules(buildModel({ bib: `@inproceedings{L_2024, title = {T}, author = {A, B}, booktitle = {B}, year = {2024}, ${body}}\n` })).findings, 'location-missing-country');
+
+test('a location that stops at a city or state is flagged on the field line', () => {
+  for (const value of ['Vienna', 'Austin, TX', 'Paris, Ile-de-France']) {
+    const [f] = locationFindings(`address = {${value}}`);
+    assert.equal(f.severity, 'info', value);
+    assert.equal(f.key, 'L_2024');
+    assert.match(f.message, /no country/);
+  }
+  assert.equal(locationFindings('location = {Vienna}').length, 1);
+});
+
+test('a location ending in a country, or a non-place, is not flagged', () => {
+  for (const value of [
+    'Vienna, Austria', 'Austin, TX, USA', 'Austin, TX, U.S.A.', 'Toronto, Canada',
+    'Seoul, Republic of Korea', 'Gen{\\`e}ve, Switzerland', 'Virtual', 'Online',
+  ]) {
+    assert.deepEqual(locationFindings(`address = {${value}}`), [], value);
+  }
+  assert.deepEqual(locationFindings(''), []);
+});
+
+test('location-missing-country skips partial entries', () => {
+  const bib = '@string{c = {Vienna}}\n@inproceedings{P_2024, title = {T}, author = {A, B}, booktitle = {B}, year = {2024}, address = c # {, x}}\n';
+  assert.deepEqual(only(runRules(buildModel({ bib })).findings, 'location-missing-country'), []);
+});

@@ -56,3 +56,56 @@ export const URL_BEARING_FIELDS = Object.freeze(['url', 'howpublished', 'note'])
 
 /** Phrases that duplicate what `urldate` already records. */
 export const ACCESSED_PHRASE = /\b(accessed|retrieved|last\s+visited|viewed)\b/i;
+
+/**
+ * Fields that carry a place of publication or conference location.
+ * `address` is BibTeX, `location` is biblatex.
+ */
+export const LOCATION_FIELDS = Object.freeze(['address', 'location']);
+
+/** Location values that are legitimately not a place. */
+export const NON_PLACE_LOCATIONS = Object.freeze(['virtual', 'online', 'hybrid', 'remote']);
+
+/** Lowercase, no diacritics, no trailing periods: the form `COUNTRIES` is keyed on. */
+export function normalizePlace(text) {
+  return String(text ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u2018\u2019]/g, "'")
+    .toLowerCase()
+    .replace(/\.+$/, '')
+    .trim();
+}
+
+/**
+ * Spellings that proceedings front matter uses but ICU's canonical region
+ * names do not: abbreviations, constituent countries, and shortened forms.
+ * Already normalized (see `normalizePlace`).
+ */
+const COUNTRY_ALIASES = Object.freeze([
+  'usa', 'us', 'u.s', 'u.s.a', 'united states of america', 'america',
+  'uk', 'u.k', 'great britain', 'england', 'scotland', 'wales', 'northern ireland',
+  'uae', 'korea', 'republic of korea', 'the netherlands', 'holland', 'turkey',
+  'burma', 'myanmar', 'viet nam', 'hong kong', 'macau', 'macao', 'czech republic',
+  'russian federation', 'ivory coast', 'palestine', 'north macedonia',
+]);
+
+/**
+ * Countries as they appear at the end of a location, from the runtime's own
+ * ISO 3166 data (`Intl.DisplayNames`) plus `COUNTRY_ALIASES`. A bare US state
+ * abbreviation is deliberately absent: "Austin, TX" is the case being caught.
+ */
+export const COUNTRIES = (() => {
+  const names = new Intl.DisplayNames(['en'], { type: 'region', fallback: 'none' });
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const found = new Set(COUNTRY_ALIASES);
+  for (const a of letters) {
+    for (const b of letters) {
+      const code = a + b;
+      if (code === 'ZZ') continue;
+      const name = names.of(code);
+      if (name) found.add(normalizePlace(name));
+    }
+  }
+  return found;
+})();
